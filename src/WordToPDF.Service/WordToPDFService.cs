@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Serilog;
 
@@ -8,10 +9,12 @@ namespace WordToPDF.Service
     {
         protected System.Timers.Timer _processTimer;
         protected bool _processLock;
+        protected List<IDocumentQueue> _documentQueues;
 
         public WordToPDFService()
         {
             Log.Debug("Construction of WordToPDFService");
+            _documentQueues = new List<IDocumentQueue>();
         }
 
         public void Start()
@@ -41,7 +44,16 @@ namespace WordToPDF.Service
             _processLock = true;
             try
             {
-
+                Log.Debug("Processing pending documents.");
+                foreach (IDocumentQueue documentQueue in _documentQueues)
+                {
+                    while (documentQueue.Count() > 0)
+                    {
+                        DocumentTarget documentTarget = documentQueue.NextDocument();
+                        // perform the print to pdf
+                        documentQueue.CompleteDocument(documentTarget);
+                    }
+                }
             }
             catch (Exception e)
             {

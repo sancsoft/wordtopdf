@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Serilog;
+using Serilog.Events;
 using Topshelf;
 
 namespace WordToPDF.Service
@@ -11,6 +12,7 @@ namespace WordToPDF.Service
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .Enrich.WithProperty("appname", Assembly.GetEntryAssembly().GetName().Name)
+                .WriteTo.Console(LogEventLevel.Verbose)
                 .CreateLogger();
 
             AssemblyName assemblyName = Assembly.GetEntryAssembly().GetName();
