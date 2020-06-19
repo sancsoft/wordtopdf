@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DocumentTarget.cs" />
+    <Compile Include="FolderDocumentQueue.cs" />
     <Compile Include="IDocumentQueue.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
