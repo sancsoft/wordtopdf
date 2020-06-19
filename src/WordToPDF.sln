@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordToPDF.ConsoleApp", "Wor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordToPDF.Library", "WordToPDF.Library\WordToPDF.Library.csproj", "{4BE4350D-4C69-4735-954F-D0FC6AB88844}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordToPDF.Service", "WordToPDF.Service\WordToPDF.Service.csproj", "{1534E23B-1970-40AC-B08D-D3A6A8A9D45E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{4BE4350D-4C69-4735-954F-D0FC6AB88844}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BE4350D-4C69-4735-954F-D0FC6AB88844}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BE4350D-4C69-4735-954F-D0FC6AB88844}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1534E23B-1970-40AC-B08D-D3A6A8A9D45E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1534E23B-1970-40AC-B08D-D3A6A8A9D45E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1534E23B-1970-40AC-B08D-D3A6A8A9D45E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1534E23B-1970-40AC-B08D-D3A6A8A9D45E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
