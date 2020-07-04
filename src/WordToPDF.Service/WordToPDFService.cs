@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Configuration;
 using System.Collections.Generic;
+using System.Data;
 using System.Reflection;
 using Serilog;
 using WordToPDF.Library;
+using System.Data.Common;
+using System.Diagnostics;
 
 namespace WordToPDF.Service
 {
@@ -29,8 +32,19 @@ namespace WordToPDF.Service
                 _documentQueues.Add(new FolderDocumentQueue(ConfigurationManager.AppSettings["FolderQueue:WatchPath"], ConfigurationManager.AppSettings["FolderQueue:SourceName"]));
             }
 
+            // enable database table watching if it is configured
+            if (ConfigurationManager.AppSettings["DatabaseQueue:Enabled"] == "true")
+            {
+                ConnectionStringSettings connectionString = ConfigurationManager.ConnectionStrings[ConfigurationManager.AppSettings["DatabaseQueue:ConnectionStringName"]];
+                IDbConnection connection = DbProviderFactories.GetFactory(connectionString.ProviderName).CreateConnection();
+                connection.ConnectionString = connectionString.ConnectionString;
+                DatabaseDocumentQueue databaseDocumentQueue = new DatabaseDocumentQueue(connection, ConfigurationManager.AppSettings["DatabaseQueue:TableName"]);
+                _documentQueues.Add(databaseDocumentQueue);
+            }
+
             _processLock = false;
-            _processTimer = new System.Timers.Timer(10000) { AutoReset = true };
+            int processTimerDelay = int.Parse(ConfigurationManager.AppSettings["ProcessTimer:DelayMS"]);
+            _processTimer = new System.Timers.Timer(processTimerDelay) { AutoReset = true };
             _processTimer.Elapsed += (sender, eventArgs) => ProcessDocuments();
             _processTimer.Start();
         }
@@ -45,7 +59,6 @@ namespace WordToPDF.Service
         public void ProcessDocuments()
         {
             ConvertService convertService = null;
-            int resultCode = -1;
 
             if(_processLock)
             {
@@ -70,14 +83,16 @@ namespace WordToPDF.Service
                         Log.Information($"Generating PDF for {documentQueue.SourceName()}: {documentTarget.Id}: {documentTarget.InputFile}");
                         try
                         {
-                            resultCode = convertService.Convert(documentTarget.InputFile, documentTarget.OutputFile);
+                            string outFile = documentTarget.OutputFile;
+                            documentTarget.ResultCode = convertService.Convert(documentTarget.InputFile, ref outFile);
+                            documentTarget.OutputFile = outFile;
                         }
                         catch (Exception e)
                         {
                             Log.Warning("Conversion exception {0}", e.Message);
-                            documentTarget.ResultCode = -1;
+                            documentTarget.ResultCode = (int)ExitCode.InternalError;
                         }
-                        Log.Information($"Generated PDF for {documentTarget.Id} as {documentTarget.OutputFile} with Result {resultCode}");
+                        Log.Information($"Generated PDF for {documentTarget.Id} as {documentTarget.OutputFile} with Result {documentTarget.ResultCode}");
                         documentQueue.CompleteDocument(documentTarget);
                     }
                 }
