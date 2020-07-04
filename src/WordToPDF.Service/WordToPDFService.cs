@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Reflection;
 using Serilog;
@@ -22,7 +23,11 @@ namespace WordToPDF.Service
         {
             Log.Warning($"Starting {Assembly.GetEntryAssembly().GetName()} on {Environment.MachineName}");
 
-            _documentQueues.Add(new FolderDocumentQueue(@"C:\Users\mterry\git\wordtopdf\src\TestFolder", "Test Folder"));
+            // enable folder watching if it is configured
+            if (ConfigurationManager.AppSettings["FolderQueue:Enabled"] == "true")
+            {
+                _documentQueues.Add(new FolderDocumentQueue(ConfigurationManager.AppSettings["FolderQueue:WatchPath"], ConfigurationManager.AppSettings["FolderQueue:SourceName"]));
+            }
 
             _processLock = false;
             _processTimer = new System.Timers.Timer(10000) { AutoReset = true };
