@@ -135,7 +135,7 @@ namespace WordToPDF.Library
             return printers;
         }
 
-        public int Convert(string inputFile, string outputFile)
+        public int Convert(string inputFile, ref string outputFile)
         {
             if (!_initialized)
             {

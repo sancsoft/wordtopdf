@@ -15,6 +15,7 @@
         EmptyWorksheet = 512,
         PDFProtectedDocument = 1024,
         ApplicationError = 2048,
-        NoPrinters = 4096
+        NoPrinters = 4096,
+        InternalError = 8192
     }
 }
