@@ -19,7 +19,7 @@ namespace WordToPDF.ConsoleApp
                 string outputFile = (args.Count() > 1) ? args[1] : null;
                 ConvertService convertService = new ConvertService();
                 convertService.Initialize();
-                convertService.Convert(inputFile, outputFile);
+                convertService.Convert(inputFile, ref outputFile);
                 return 0;
             }
             catch(Exception e)
