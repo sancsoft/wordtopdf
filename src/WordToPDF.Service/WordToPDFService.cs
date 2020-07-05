@@ -2,11 +2,12 @@
 using System.Configuration;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Net.Http;
 using System.Reflection;
 using Serilog;
 using WordToPDF.Library;
-using System.Data.Common;
-using System.Diagnostics;
+
 
 namespace WordToPDF.Service
 {
@@ -15,6 +16,7 @@ namespace WordToPDF.Service
         protected System.Timers.Timer _processTimer;
         protected bool _processLock;
         protected List<IDocumentQueue> _documentQueues;
+        protected string _heartbeatEndpoint;
 
         public WordToPDFService()
         {
@@ -42,6 +44,9 @@ namespace WordToPDF.Service
                 _documentQueues.Add(databaseDocumentQueue);
             }
 
+            // configure the UptimeRobot Heartbeat client and endpoint
+            _heartbeatEndpoint = ConfigurationManager.AppSettings["UptimeRobot:HeartbeatEndpoint"];
+
             _processLock = false;
             int processTimerDelay = int.Parse(ConfigurationManager.AppSettings["ProcessTimer:DelayMS"]);
             _processTimer = new System.Timers.Timer(processTimerDelay) { AutoReset = true };
@@ -67,6 +72,22 @@ namespace WordToPDF.Service
             }
 
             _processLock = true;
+
+            if (!String.IsNullOrEmpty(_heartbeatEndpoint))
+            {
+                // synchronous use of async. reading repsonse string as async synchronizes the call
+                using (var client = new HttpClient())
+                {
+                    var response = client.GetAsync(_heartbeatEndpoint).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseContent = response.Content;
+                        responseContent.ReadAsStringAsync();
+                        Log.Debug("UptimeRobot heartbeat link touched");
+                    }
+                }
+            }
+
             try
             {
                 Log.Debug("Processing pending documents.");
