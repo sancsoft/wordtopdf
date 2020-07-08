@@ -31,7 +31,7 @@ namespace WordToPDF.Service
 
         public void CompleteDocument(DocumentTarget documentTarget)
         {
-            _connection.Execute($"UPDATE {_tableName} SET ResultCode=@ResultCode, InputFile=@InputFile, OutputFile=@OutputFile", documentTarget);
+            _connection.Execute($"UPDATE {_tableName} SET ResultCode=@ResultCode, InputFile=@InputFile, OutputFile=@OutputFile WHERE ID=@Id", documentTarget);
         }
     }
 }
